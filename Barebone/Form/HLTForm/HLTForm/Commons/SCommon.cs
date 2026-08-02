@@ -1004,66 +1004,11 @@ namespace HLTStudio.Commons
 			return src.Concat(elements);
 		}
 
+		private const int DISK_IO_RETRY_CHANGE_ATTR_01 = 7;
+		private const int DISK_IO_RETRY_CHANGE_ATTR_02 = 10;
+		private const int DISK_IO_RETRY_CHANGE_ATTR_03 = 13;
 		private const int DISK_IO_RETRY_MAX = 20;
 		private const int DISK_IO_RETRY_DELAY_MILLIS_BASE = 10;
-
-		public static void DeletePath(string path)
-		{
-			if (path == null)
-				throw new Exception("削除しようとしたパスは定義されていません。");
-
-			if (path == "")
-				throw new Exception("削除しようとしたパスは空文字列です。");
-
-			// memo: 空白だけのファイル・フォルダ(例："\u3000")も削除できるので path.Trim() == "" はチェックしない。
-
-			if (File.Exists(path))
-			{
-				for (int retryCount = 0; ; retryCount++)
-				{
-					if (retryCount > 0)
-						Thread.Sleep(retryCount * DISK_IO_RETRY_DELAY_MILLIS_BASE);
-
-					try
-					{
-						File.Delete(path);
-					}
-					catch
-					{ }
-
-					if (!File.Exists(path))
-						break;
-
-					if (retryCount >= DISK_IO_RETRY_MAX)
-						throw new Exception($"ファイルの削除に失敗しました。パス：{path}");
-
-					ProcMain.WriteLog($"ファイルの削除をリトライします。パス：{path}");
-				}
-			}
-			else if (Directory.Exists(path))
-			{
-				for (int retryCount = 0; ; retryCount++)
-				{
-					if (retryCount > 0)
-						Thread.Sleep(retryCount * DISK_IO_RETRY_DELAY_MILLIS_BASE);
-
-					try
-					{
-						Directory.Delete(path, true);
-					}
-					catch
-					{ }
-
-					if (!Directory.Exists(path))
-						break;
-
-					if (retryCount >= DISK_IO_RETRY_MAX)
-						throw new Exception($"ディレクトリの削除に失敗しました。パス：{path}");
-
-					ProcMain.WriteLog($"ディレクトリの削除をリトライします。パス：{path}");
-				}
-			}
-		}
 
 		public static void CreateDir(string dir)
 		{
@@ -1095,6 +1040,96 @@ namespace HLTStudio.Commons
 
 				ProcMain.WriteLog($"ディレクトリの作成をリトライします。パス：{dir}");
 			}
+		}
+
+		public static void DeletePath(string path)
+		{
+			if (path == null)
+				throw new Exception("削除しようとしたパスは定義されていません。");
+
+			if (path == "")
+				throw new Exception("削除しようとしたパスは空文字列です。");
+
+			// memo: 空白だけのファイル・フォルダ(例："\u3000")も削除できるので path.Trim() == "" はチェックしない。
+
+			if (File.Exists(path))
+			{
+				for (int retryCount = 0; ; retryCount++)
+				{
+					if (retryCount > 0)
+						Thread.Sleep(retryCount * DISK_IO_RETRY_DELAY_MILLIS_BASE);
+
+					if (
+						retryCount == DISK_IO_RETRY_CHANGE_ATTR_01 ||
+						retryCount == DISK_IO_RETRY_CHANGE_ATTR_02 ||
+						retryCount == DISK_IO_RETRY_CHANGE_ATTR_03
+						)
+						AntiAttributePath(path, false);
+
+					try
+					{
+						File.Delete(path);
+					}
+					catch
+					{ }
+
+					if (!File.Exists(path))
+						break;
+
+					if (retryCount >= DISK_IO_RETRY_MAX)
+						throw new Exception($"ファイルの削除に失敗しました。パス：{path}");
+
+					ProcMain.WriteLog($"ファイルの削除をリトライします。パス：{path}");
+				}
+			}
+			else if (Directory.Exists(path))
+			{
+				for (int retryCount = 0; ; retryCount++)
+				{
+					if (retryCount > 0)
+						Thread.Sleep(retryCount * DISK_IO_RETRY_DELAY_MILLIS_BASE);
+
+					if (
+						retryCount == DISK_IO_RETRY_CHANGE_ATTR_01 ||
+						retryCount == DISK_IO_RETRY_CHANGE_ATTR_02 ||
+						retryCount == DISK_IO_RETRY_CHANGE_ATTR_03
+						)
+						AntiAttributePath(path, true);
+
+					try
+					{
+						Directory.Delete(path, true);
+					}
+					catch
+					{ }
+
+					if (!Directory.Exists(path))
+						break;
+
+					if (retryCount >= DISK_IO_RETRY_MAX)
+						throw new Exception($"ディレクトリの削除に失敗しました。パス：{path}");
+
+					ProcMain.WriteLog($"ディレクトリの削除をリトライします。パス：{path}");
+				}
+			}
+		}
+
+		private static void AntiAttributePath(string path, bool dirFlag)
+		{
+			ProcMain.WriteLog("ファイル・ディレクトリ属性の解除.1 " + dirFlag);
+			try
+			{
+				if (dirFlag)
+					foreach (string subPath in Directory.EnumerateFileSystemEntries(path, "*", SearchOption.AllDirectories))
+						File.SetAttributes(subPath, FileAttributes.Normal);
+
+				File.SetAttributes(path, FileAttributes.Normal);
+			}
+			catch (Exception ex)
+			{
+				ProcMain.WriteLog(ex.Message);
+			}
+			ProcMain.WriteLog("ファイル・ディレクトリ属性の解除.2");
 		}
 
 		public static void DeleteAndCreateDir(string dir)
