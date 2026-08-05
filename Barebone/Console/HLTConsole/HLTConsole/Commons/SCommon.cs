@@ -1119,6 +1119,8 @@ namespace HLTStudio.Commons
 			ProcMain.WriteLog("ファイル・ディレクトリ属性の解除.1 " + dirFlag);
 			try
 			{
+				// memo: ディレクトリに対しても File.SetAttributes を使ってよい。
+
 				if (dirFlag)
 					foreach (string subPath in Directory.EnumerateFileSystemEntries(path, "*", SearchOption.AllDirectories))
 						File.SetAttributes(subPath, FileAttributes.Normal);
