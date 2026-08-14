@@ -4675,24 +4675,24 @@ namespace HLTStudio.Commons
 			}
 		}
 
-		private struct P_AS_IndexedValue<T>
+		private struct P_SS_IndexedValue<T>
 		{
 			public int Index;
 			public T Value;
 		}
 
-		public static void AnzenSort<T>(IList<T> list, Comparison<T> comp)
+		public static void StableSort<T>(IList<T> list, Comparison<T> comp)
 		{
 			int count = list.Count;
 
 			if (count < 2)
 				return;
 
-			P_AS_IndexedValue<T>[] ivList = new P_AS_IndexedValue<T>[count];
+			P_SS_IndexedValue<T>[] ivList = new P_SS_IndexedValue<T>[count];
 
 			for (int index = 0; index < count; index++)
 			{
-				ivList[index] = new P_AS_IndexedValue<T>()
+				ivList[index] = new P_SS_IndexedValue<T>()
 				{
 					Index = index,
 					Value = list[index],
@@ -4725,11 +4725,11 @@ namespace HLTStudio.Commons
 			if (count < 2)
 				return;
 
-			P_AS_IndexedValue<T>[] ivList = new P_AS_IndexedValue<T>[count];
+			P_SS_IndexedValue<T>[] ivList = new P_SS_IndexedValue<T>[count];
 
 			for (int index = 0; index < count; index++)
 			{
-				ivList[index] = new P_AS_IndexedValue<T>()
+				ivList[index] = new P_SS_IndexedValue<T>()
 				{
 					Index = index,
 					Value = list[index],
@@ -4751,7 +4751,7 @@ namespace HLTStudio.Commons
 				if (comp(ivList[w - 1].Value, ivList[r].Value) != 0)
 					ivList[w++] = ivList[r];
 
-			Array.Sort(ivList, 0, w, SCommon.GetAnonyComparer<P_AS_IndexedValue<T>>((a, b) => a.Index - b.Index));
+			Array.Sort(ivList, 0, w, SCommon.GetAnonyComparer<P_SS_IndexedValue<T>>((a, b) => a.Index - b.Index));
 
 			for (int index = 0; index < w; index++)
 				list[index] = ivList[index].Value;
@@ -5516,7 +5516,7 @@ namespace HLTStudio.Commons
 			}
 		}
 
-		public static void BubunSort<T>(IList<T> list, int offset, int size, Comparison<T> comp)
+		public static void SortRange<T>(IList<T> list, int offset, int size, Comparison<T> comp)
 		{
 			if (
 				list == null ||
@@ -5532,7 +5532,7 @@ namespace HLTStudio.Commons
 			Sort_m.CombSort(size, i => list[offset + i], (a, b) => SCommon.Swap(list, offset + a, offset + b), comp);
 		}
 
-		public static void BubunAnzenSort<T>(IList<T> list, int offset, int size, Comparison<T> comp)
+		public static void StableSortRange<T>(IList<T> list, int offset, int size, Comparison<T> comp)
 		{
 			if (
 				list == null ||
@@ -5545,11 +5545,11 @@ namespace HLTStudio.Commons
 			if (size < 2) // ? ソート不要
 				return;
 
-			P_AS_IndexedValue<T>[] ivList = new P_AS_IndexedValue<T>[size];
+			P_SS_IndexedValue<T>[] ivList = new P_SS_IndexedValue<T>[size];
 
 			for (int index = 0; index < size; index++) // 取り出す。
 			{
-				ivList[index] = new P_AS_IndexedValue<T>()
+				ivList[index] = new P_SS_IndexedValue<T>()
 				{
 					Index = index,
 					Value = list[offset + index],
