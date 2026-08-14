@@ -5605,37 +5605,37 @@ namespace HLTStudio.Commons
 			}
 		}
 
-		public static class OpenHandle_m
+		public static class CreateHandle_m // ミューテックス・名前付きイベントを開く用モジュール(仮)
 		{
-			private const string NAME_PREFIX_LOCAL = "Local\\";
+			//private const string NAME_PREFIX_LOCAL = "Local\\";
 			private const string NAME_PREFIX_GLOBAL = "Global\\";
 
-			public static Mutex Mutex(string name)
+			public static Mutex CreateMutex(string name)
 			{
-				return new Mutex(false, NAME_PREFIX_LOCAL + name);
+				return new Mutex(false, name);
 			}
 
-			public static Mutex MutexGlobal(string name)
+			public static Mutex CreateMutexGlobal(string name)
 			{
 				return new Mutex(false, NAME_PREFIX_GLOBAL + name, out bool createNew, CreateMutexSecurityFull());
 			}
 
-			public static EventWaitHandle NamedEvent(string name)
+			public static EventWaitHandle CreateNamedEvent(string name)
 			{
-				return new EventWaitHandle(false, EventResetMode.AutoReset, NAME_PREFIX_LOCAL + name);
+				return new EventWaitHandle(false, EventResetMode.AutoReset, name);
 			}
 
-			public static EventWaitHandle NamedEventManual(string name)
+			public static EventWaitHandle CreateNamedEventManual(string name)
 			{
-				return new EventWaitHandle(false, EventResetMode.ManualReset, NAME_PREFIX_LOCAL + name);
+				return new EventWaitHandle(false, EventResetMode.ManualReset, name);
 			}
 
-			public static EventWaitHandle NamedEventGlobal(string name)
+			public static EventWaitHandle CreateNamedEventGlobal(string name)
 			{
 				return new EventWaitHandle(false, EventResetMode.AutoReset, NAME_PREFIX_GLOBAL + name, out bool createNew, CreateEventWaitHandleSecurityFull());
 			}
 
-			public static EventWaitHandle NamedEventGlobalManual(string name)
+			public static EventWaitHandle CreateNamedEventGlobalManual(string name)
 			{
 				return new EventWaitHandle(false, EventResetMode.ManualReset, NAME_PREFIX_GLOBAL + name, out bool createNew, CreateEventWaitHandleSecurityFull());
 			}
