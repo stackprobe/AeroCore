@@ -1004,9 +1004,6 @@ namespace HLTStudio.Commons
 			return src.Concat(elements);
 		}
 
-		private const int DISK_IO_RETRY_CHANGE_ATTR_01 = 7;
-		private const int DISK_IO_RETRY_CHANGE_ATTR_02 = 10;
-		private const int DISK_IO_RETRY_CHANGE_ATTR_03 = 13;
 		private const int DISK_IO_RETRY_MAX = 20;
 		private const int DISK_IO_RETRY_DELAY_MILLIS_BASE = 10;
 
@@ -1059,13 +1056,6 @@ namespace HLTStudio.Commons
 					if (retryCount > 0)
 						Thread.Sleep(retryCount * DISK_IO_RETRY_DELAY_MILLIS_BASE);
 
-					if (
-						retryCount == DISK_IO_RETRY_CHANGE_ATTR_01 ||
-						retryCount == DISK_IO_RETRY_CHANGE_ATTR_02 ||
-						retryCount == DISK_IO_RETRY_CHANGE_ATTR_03
-						)
-						AntiAttributePath(path, false);
-
 					try
 					{
 						File.Delete(path);
@@ -1075,6 +1065,21 @@ namespace HLTStudio.Commons
 
 					if (!File.Exists(path))
 						break;
+
+					if (retryCount == 0)
+					{
+						AntiAttributePath(path, false);
+
+						try
+						{
+							File.Delete(path);
+						}
+						catch
+						{ }
+
+						if (!File.Exists(path))
+							break;
+					}
 
 					if (retryCount >= DISK_IO_RETRY_MAX)
 						throw new Exception($"ファイルの削除に失敗しました。パス：{path}");
@@ -1089,13 +1094,6 @@ namespace HLTStudio.Commons
 					if (retryCount > 0)
 						Thread.Sleep(retryCount * DISK_IO_RETRY_DELAY_MILLIS_BASE);
 
-					if (
-						retryCount == DISK_IO_RETRY_CHANGE_ATTR_01 ||
-						retryCount == DISK_IO_RETRY_CHANGE_ATTR_02 ||
-						retryCount == DISK_IO_RETRY_CHANGE_ATTR_03
-						)
-						AntiAttributePath(path, true);
-
 					try
 					{
 						Directory.Delete(path, true);
@@ -1105,6 +1103,21 @@ namespace HLTStudio.Commons
 
 					if (!Directory.Exists(path))
 						break;
+
+					if (retryCount == 0)
+					{
+						AntiAttributePath(path, true);
+
+						try
+						{
+							Directory.Delete(path, true);
+						}
+						catch
+						{ }
+
+						if (!Directory.Exists(path))
+							break;
+					}
 
 					if (retryCount >= DISK_IO_RETRY_MAX)
 						throw new Exception($"ディレクトリの削除に失敗しました。パス：{path}");
