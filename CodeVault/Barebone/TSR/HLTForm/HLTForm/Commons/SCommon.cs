@@ -1129,7 +1129,7 @@ namespace HLTStudio.Commons
 
 		private static void AntiAttributePath(string path, bool dirFlag)
 		{
-			ProcMain.WriteLog("ファイル・ディレクトリ属性の解除.1 " + dirFlag);
+			ProcMain.WriteLog($"ファイル・ディレクトリ属性の解除.1 {(dirFlag ? 'D' : 'F')} {path}");
 			try
 			{
 				// memo: ディレクトリに対しても File.SetAttributes を使ってよい。
