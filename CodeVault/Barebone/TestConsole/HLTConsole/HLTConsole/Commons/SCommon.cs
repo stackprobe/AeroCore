@@ -5734,5 +5734,26 @@ namespace HLTStudio.Commons
 					.ToArray();
 			}
 		}
+
+		public static void Dispose<T>(ref T handle) where T : class, IDisposable
+		{
+			if (handle != null)
+			{
+				Dispose(handle);
+				handle = null;
+			}
+		}
+
+		public static void Dispose(IDisposable handle)
+		{
+			try
+			{
+				handle.Dispose();
+			}
+			catch (Exception ex)
+			{
+				ProcMain.WriteLog(ex);
+			}
+		}
 	}
 }
