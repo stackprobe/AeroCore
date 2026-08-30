@@ -129,7 +129,7 @@ namespace HLTStudio
 
 		public static IEnumerable<T> Linearize<T>(this IEnumerable<T[]> src)
 		{
-			return SCommon.Linearize(src);
+			return SCommon.Flatten(src);
 		}
 
 		public static string ReplaceAll(this string text, params string[] replacements)

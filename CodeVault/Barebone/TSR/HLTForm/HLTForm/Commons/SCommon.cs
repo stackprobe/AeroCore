@@ -836,7 +836,7 @@ namespace HLTStudio.Commons
 		/// <typeparam name="T">要素の型</typeparam>
 		/// <param name="src">列挙の列挙(2次元配列)</param>
 		/// <returns>列挙(1次元配列)</returns>
-		public static IEnumerable<T> Linearize<T>(IEnumerable<T[]> src)
+		public static IEnumerable<T> Flatten<T>(IEnumerable<T[]> src)
 		{
 			List<T[]> srcTable = src.ToList();
 
