@@ -20,6 +20,10 @@ namespace HLTStudio.Tools
 			: this(file, GetFileEncoding(file))
 		{ }
 
+		public CsvFileReader(string file, char delimiter)
+			: this(file, GetFileEncoding(file), delimiter)
+		{ }
+
 		public CsvFileReader(string file, Encoding encoding)
 			: this(file, encoding, DELIMITER_COMMA)
 		{ }
@@ -128,6 +132,11 @@ namespace HLTStudio.Tools
 		public static string[][] ReadToEnd(string file)
 		{
 			return ReadToEnd(file, GetFileEncoding(file));
+		}
+
+		public static string[][] ReadToEnd(string file, char delimiter)
+		{
+			return ReadToEnd(file, GetFileEncoding(file), delimiter);
 		}
 
 		public static string[][] ReadToEnd(string file, Encoding encoding)
