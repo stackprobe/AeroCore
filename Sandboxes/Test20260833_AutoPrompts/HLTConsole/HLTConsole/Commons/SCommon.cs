@@ -5264,6 +5264,22 @@ namespace HLTStudio.Commons
 			}
 		}
 
+		public static string GetVisualStudioProgramHomeDir()
+		{
+			return IsRunningOnVisualStudio() ?
+				SCommon.ToFullPath(Path.Combine(ProcMain.SelfDir, @"..\..\..\..")) :
+				ProcMain.SelfDir;
+		}
+
+		public static bool IsRunningOnVisualStudio()
+		{
+			return Regex.IsMatch(
+				ProcMain.SelfDir,
+				@"^[A-Z]:\\.+\\(?<project>HLT[A-Za-z]{1,30})\\\k<project>\\bin\\(?:Debug|Release)$",
+				RegexOptions.IgnoreCase
+				);
+		}
+
 		// RESLinesTo*系メソッドの使い方メモ：
 		// -- https://github.com/stackprobe/notehub/blob/main/DevSourceRef/UsageExample_SCommon_RESLines.md
 
