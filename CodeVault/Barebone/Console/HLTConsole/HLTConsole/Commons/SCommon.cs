@@ -1360,6 +1360,113 @@ namespace HLTStudio.Commons
 			}
 		}
 
+		public static bool IsSameDir(string dir1, string dir2)
+		{
+			// ディレクトリの比較
+			{
+				string[] dirNames = Directory.GetDirectories(dir1)
+					.Select(d => Path.GetFileName(d))
+					.OrderBy(SCommon.CompIgnoreCase)
+					.ToArray();
+
+				{
+					string[] dirNames2 = Directory.GetDirectories(dir2)
+						.Select(d => Path.GetFileName(d))
+						.OrderBy(SCommon.CompIgnoreCase)
+						.ToArray();
+
+					if (SCommon.Comp(dirNames, dirNames2, SCommon.CompIgnoreCase) != 0)
+						return false;
+				}
+
+				foreach (string dirName in dirNames)
+				{
+					if (!SCommon.IsSameDir(
+						Path.Combine(dir1, dirName),
+						Path.Combine(dir2, dirName)
+						))
+						return false;
+				}
+			}
+
+			// ファイルの比較
+			{
+				string[] fileNames = Directory.GetFiles(dir1)
+					.Select(f => Path.GetFileName(f))
+					.OrderBy(SCommon.CompIgnoreCase)
+					.ToArray();
+
+				{
+					string[] fileNames2 = Directory.GetFiles(dir2)
+						.Select(f => Path.GetFileName(f))
+						.OrderBy(SCommon.CompIgnoreCase)
+						.ToArray();
+
+					if (SCommon.Comp(fileNames, fileNames2, SCommon.CompIgnoreCase) != 0)
+						return false;
+				}
+
+				foreach (string fileName in fileNames)
+				{
+					if (!SCommon.IsSameFile(
+						Path.Combine(dir1, fileName),
+						Path.Combine(dir2, fileName)
+						))
+						return false;
+				}
+			}
+
+			return true;
+		}
+
+		public static bool IsSameFile(string file1, string file2)
+		{
+			long size = new FileInfo(file1).Length;
+
+			if (size != new FileInfo(file2).Length)
+				return false;
+
+			byte[] buffer1 = new byte[SCommon.STANDARD_STREAM_BUFFER_SIZE];
+			byte[] buffer2 = new byte[SCommon.STANDARD_STREAM_BUFFER_SIZE];
+
+			using (var reader1 = SCommon.OpenFile_m.OpenBinaryFileForRead(file1))
+			using (var reader2 = SCommon.OpenFile_m.OpenBinaryFileForRead(file2))
+			{
+				while (0L < size)
+				{
+					int readSize = (int)Math.Min((long)SCommon.STANDARD_STREAM_BUFFER_SIZE, size);
+
+					SCommon.Read(reader1, buffer1, 0, readSize);
+					SCommon.Read(reader2, buffer2, 0, readSize);
+
+					if (!SCommon.IsSame(buffer1, buffer2, 0, readSize))
+						return false;
+
+					size -= (int)readSize;
+				}
+			}
+			return true;
+		}
+
+		public static bool IsSame(byte[] data1, byte[] data2, int offset = 0)
+		{
+			int size = data1.Length;
+
+			if (size != data2.Length)
+				return false;
+
+			return IsSame(data1, data2, offset, size - offset);
+		}
+
+		public static bool IsSame(byte[] data1, byte[] data2, int offset, int size)
+		{
+			for (int index = 0; index < size; index++)
+				if (data1[offset + index] != data2[offset + index])
+					return false;
+
+			return true;
+		}
+
 		public static string ChangeRoot(string path, string oldRoot, string newRoot)
 		{
 			return PutYen(newRoot) + EraseRoot(path, oldRoot);
