@@ -1467,6 +1467,46 @@ namespace HLTStudio.Commons
 			return true;
 		}
 
+		public static int MemComp(byte[] data1, byte[] data2)
+		{
+			int size = Math.Min(data1.Length, data2.Length);
+
+			for (int index = 0; index < size; index++)
+			{
+				int ret = (int)data1[index] - (int)data2[index];
+
+				if (ret != 0)
+					return ret;
+			}
+			return data1.Length - data2.Length;
+		}
+
+		public static int MemComp(byte[] data1, byte[] data2, int offset)
+		{
+			int size = Math.Min(data1.Length, data2.Length) - offset;
+
+			for (int index = 0; index < size; index++)
+			{
+				int ret = (int)data1[offset + index] - (int)data2[offset + index];
+
+				if (ret != 0)
+					return ret;
+			}
+			return data1.Length - data2.Length;
+		}
+
+		public static int MemComp(byte[] data1, byte[] data2, int offset, int size)
+		{
+			for (int index = 0; index < size; index++)
+			{
+				int ret = (int)data1[offset + index] - (int)data2[offset + index];
+
+				if (ret != 0)
+					return ret;
+			}
+			return 0;
+		}
+
 		public static string ChangeRoot(string path, string oldRoot, string newRoot)
 		{
 			return PutYen(newRoot) + EraseRoot(path, oldRoot);
